@@ -1,7 +1,15 @@
 # godis-cli
 a redis command client tool writen in golang
 
+## Dependency
 
+is dependent on redigo mobule, you can install it with:
+
+```sh
+go get github.com/gomodule/redigo/redis
+```
+
+## Help
 
 ```sh
 this is a command tool for redis
