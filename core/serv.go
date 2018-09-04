@@ -77,9 +77,15 @@ func Init() {
 
 func ListServers() {
 	Init()
-	fmt.Println("The servers you added are:")
-	for _, serv := range ServersCache {
-		fmt.Println(serv.Name + " : " + serv.Host)
+	fmt.Println("Servers(Name:Host):")
+	var maxLen = 0
+	for _, s := range ServersCache {
+		if len(s.Name) > maxLen {
+			maxLen = len(s.Name)
+		}
+	}
+	for _, s := range ServersCache {
+		fmt.Println("  " + s.Name + strings.Repeat(" ", maxLen - len(s.Name)) + " : " + s.Host)
 	}
 }
 
@@ -104,7 +110,6 @@ func AddServer(name string, host string, port int, auth string) {
 		}
 	}
 
-	fmt.Printf("server list size:%d, %s exist: %v\n", len(ServersCache), name, exists)
 	if !exists {
 		server := RedisServer{
 			Name: name,
@@ -118,7 +123,7 @@ func AddServer(name string, host string, port int, auth string) {
 }
 
 func persistent2Local() {
-	fmt.Printf("persistenting...\n")
+	//fmt.Printf("persistenting...\n")
 	ensureSavePathExist(localStoragePath)
 	file, _ := os.Create(localStoragePath + localStorageFile)
 	writer := bufio.NewWriter(file)

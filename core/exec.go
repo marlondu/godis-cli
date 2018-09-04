@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func cmdParser(server *RedisServer) {
 	}
 	for   {
 		line := readLine(reader, server)
-		expr := "[\\s+]"
+		expr := "[\\s]+"
 		regex, err := regexp.Compile(expr)
 		if err != nil {
 			fmt.Println("regex error: ", err)
@@ -97,5 +98,6 @@ func readLine(reader *bufio.Reader, server *RedisServer) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return string(data)
+	line := string(data)
+	return strings.TrimSpace(line)
 }
