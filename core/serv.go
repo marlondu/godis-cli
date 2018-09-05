@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/user"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -30,7 +32,7 @@ func (rs *RedisServer) info() string {
 }
 
 // local storage file's path
-const localStoragePath = "./"
+// const localStoragePath = "./"
 const localStorageFile = "cli.cache"
 
 var ServersCache = make([]RedisServer, 0)
@@ -41,7 +43,7 @@ func Init() {
 	if len(ServersCache) > 0 {
 		return
 	}
-	filePath := localStoragePath + localStorageFile
+	filePath := getStoragePath() + localStorageFile
 	if isFileExist(filePath) {
 		file, err := os.Open(filePath)
 		if err != nil {
@@ -85,7 +87,7 @@ func ListServers() {
 		}
 	}
 	for _, s := range ServersCache {
-		fmt.Println("  " + s.Name + strings.Repeat(" ", maxLen - len(s.Name)) + " : " + s.Host)
+		fmt.Println("  " + s.Name + strings.Repeat(" ", maxLen-len(s.Name)) + " : " + s.Host)
 	}
 }
 
@@ -123,14 +125,14 @@ func AddServer(name string, host string, port int, auth string) {
 }
 
 func persistent2Local() {
-	//fmt.Printf("persistenting...\n")
-	ensureSavePathExist(localStoragePath)
-	file, _ := os.Create(localStoragePath + localStorageFile)
+	// fmt.Printf("persistenting...\n")
+	// ensureSavePathExist(localStoragePath)
+	file, _ := os.Create(getStoragePath() + localStorageFile)
 	writer := bufio.NewWriter(file)
 	defer func() {
 		writer.Flush()
 		file.Close()
-		fmt.Println("persistent to local successfully")
+		fmt.Println("save successfully")
 	}()
 	l := len(ServersCache)
 	for i, server := range ServersCache {
@@ -160,14 +162,14 @@ func RemoveServer(name string, host string) {
 				tempServers = append(tempServers, s)
 			}
 		}
-	}else {
-		if  name != "" {
+	} else {
+		if name != "" {
 			for _, s := range ServersCache {
 				if s.Name != name {
 					tempServers = append(tempServers, s)
 				}
 			}
-		}else if host != "" {
+		} else if host != "" {
 			for _, s := range ServersCache {
 				if s.Host != host {
 					tempServers = append(tempServers, s)
@@ -181,7 +183,7 @@ func RemoveServer(name string, host string) {
 
 func ConnectServer(name string) {
 	Init()
-	for _, s := range ServersCache  {
+	for _, s := range ServersCache {
 		if s.Name == name {
 			cmdParser(&s)
 			break
@@ -219,7 +221,6 @@ func InfoServer(name string, host string) {
 	}
 }
 
-
 func ensureSavePathExist(dir string) {
 	if !isDirExist(dir) {
 		os.MkdirAll(dir, os.ModePerm)
@@ -240,4 +241,21 @@ func isFileExist(filePath string) bool {
 		return os.IsExist(err)
 	}
 	return !info.IsDir()
+}
+
+func getStoragePath() string {
+	ur, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	osName := runtime.GOOS
+	var dir string
+	if strings.Contains(osName, "windows") {
+		dir = strings.Replace(ur.HomeDir, "\\", "/", -1)
+		dir = dir + "/godis-cli/"
+	} else {
+		dir = ur.HomeDir + "/godis-cli/"
+	}
+	ensureSavePathExist(dir)
+	return dir
 }

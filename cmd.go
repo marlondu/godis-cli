@@ -22,7 +22,7 @@ import (
 //}
 
 var (
-	h = flag.String("h", "", "the server host of redis, default localhost")
+	h = flag.String("h", "", "the server host of redis, default \"\"")
 	p = flag.Int("p", 6379, "redis server's port, default is 6379")
 	a = flag.String("a", "", "the auth of redis server,default nil")
 	n = flag.String("n", "", "the name of redis server, you should specify when you add")
@@ -40,12 +40,12 @@ func main() {
 
 func dealCmds(cmds []string) {
 	l := len(cmds)
-	var mainCmd =  cmds[0]
+	var mainCmd = cmds[0]
 	switch mainCmd {
 	case "help":
 		if l > 1 {
 			helpCmd(cmds[1])
-		}else {
+		} else {
 			printHelpTips()
 		}
 		break
@@ -73,14 +73,13 @@ func dealCmds(cmds []string) {
 	}
 }
 
-
 func helpCmd(cmd string) {
 	cmd = strings.ToLower(cmd)
 	switch cmd {
 	case "help":
 		printHelpTips()
 		break
-	case "list","add","update", "remove", "info":
+	case "list", "add", "update", "remove", "info":
 		printCmdHelpTips()
 		break
 	default:
@@ -91,8 +90,7 @@ func helpCmd(cmd string) {
 
 // print help tip
 func printHelpTips() {
-	var tips =
-		`this is a command tool for redis
+	var tips = `this is a command tool for redis
 
 Usage:
 	godis-cli <command> [arguments]

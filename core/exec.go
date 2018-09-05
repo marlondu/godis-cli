@@ -23,9 +23,9 @@ func cmdParser(server *RedisServer) {
 	address := server.Host + ":" + strconv.Itoa(server.Port)
 	if server.Auth != "" {
 		option := redis.DialPassword(server.Auth)
-		conn, err = redis.Dial("tcp", address, option, redis.DialConnectTimeout(3 * time.Second))
-	}else {
-		conn, err = redis.Dial("tcp", address, redis.DialConnectTimeout(3 * time.Second))
+		conn, err = redis.Dial("tcp", address, option, redis.DialConnectTimeout(3*time.Second))
+	} else {
+		conn, err = redis.Dial("tcp", address, redis.DialConnectTimeout(3*time.Second))
 	}
 	// release connection when function exit
 	defer func() {
@@ -35,7 +35,7 @@ func cmdParser(server *RedisServer) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for   {
+	for {
 		line := readLine(reader, server)
 		expr := "[\\s]+"
 		regex, err := regexp.Compile(expr)
@@ -47,7 +47,7 @@ func cmdParser(server *RedisServer) {
 		l := len(commands)
 		if l > 1 {
 			cmd := commands[0]
-			params := make([]interface{},l - 1)
+			params := make([]interface{}, l-1)
 			for i, c := range commands[1:] {
 				params[i] = c
 			}
@@ -57,11 +57,11 @@ func cmdParser(server *RedisServer) {
 				continue
 			}
 			printReply(reply)
-		}else if l == 1 {
+		} else if l == 1 {
 			if commands[0] == "exit" {
 				fmt.Println("exit ...")
 				break
-			}else {
+			} else {
 				fmt.Println("invalid command or parameters are required")
 			}
 		}
@@ -94,7 +94,7 @@ func printReply(reply interface{}) {
 
 func readLine(reader *bufio.Reader, server *RedisServer) string {
 	fmt.Printf("%s>", server.Name)
-	data,_, err := reader.ReadLine()
+	data, _, err := reader.ReadLine()
 	if err != nil {
 		log.Fatal(err)
 	}
