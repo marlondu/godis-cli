@@ -93,7 +93,7 @@ func printHelpTips() {
 	var tips = `this is a command tool for redis
 
 Usage:
-	godis-cli <command> [arguments]
+	godis-cli [arguments] <command> 
 
 The commands are:
 	add		add a new redis server
