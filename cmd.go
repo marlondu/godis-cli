@@ -42,30 +42,27 @@ func dealCmds(cmds []string) {
 	l := len(cmds)
 	var mainCmd = cmds[0]
 	switch mainCmd {
-	case "help":
+	case "help", "h":
 		if l > 1 {
 			helpCmd(cmds[1])
 		} else {
 			printHelpTips()
 		}
 		break
-	case "add":
+	case "add", "a":
 		core.AddServer(*n, *h, *p, *a)
 		break
-	case "list":
+	case "list", "l":
 		core.ListServers()
 		break
-	case "update":
+	case "update", "u":
 		core.UpdateServer(*n, *h, *p, *a)
 		break
-	case "remove":
+	case "remove", "r":
 		core.RemoveServer(*n, *h)
 		break
-	case "conn":
+	case "conn", "c":
 		core.ConnectServer(*n)
-		break
-	case "info":
-		core.InfoServer(*n, *h)
 		break
 	default:
 		fmt.Println("Use command \"godis-cli help\" for more information")
@@ -76,7 +73,7 @@ func dealCmds(cmds []string) {
 func helpCmd(cmd string) {
 	cmd = strings.ToLower(cmd)
 	switch cmd {
-	case "help":
+	case "help", "h":
 		printHelpTips()
 		break
 	case "list", "add", "update", "remove", "info":
@@ -96,12 +93,11 @@ Usage:
 	godis-cli [arguments] <command> 
 
 The commands are:
-	add		add a new redis server
+	add	add a new redis server
 	list	list all servers
 	update	update a server
 	remove 	remove a server
 	conn	connect to server
-	info 	check the info of a server
 
 Use "godis-cli help <command>" for more information about a command`
 

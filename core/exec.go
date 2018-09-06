@@ -22,7 +22,7 @@ func cmdParser(server *RedisServer) {
 	// create connection with redis
 	address := server.Host + ":" + strconv.Itoa(server.Port)
 	if server.Auth != "" {
-		option := redis.DialPassword(server.Auth)
+		option := redis.DialPassword(Decrypt(server.Auth))
 		conn, err = redis.Dial("tcp", address, option, redis.DialConnectTimeout(3*time.Second))
 	} else {
 		conn, err = redis.Dial("tcp", address, redis.DialConnectTimeout(3*time.Second))

@@ -64,7 +64,7 @@ func Init() {
 						Name: name,
 						Host: host,
 						Port: port,
-						Auth: auth,
+						Auth: Encrypt(auth),
 					}
 					ServersCache = append(ServersCache, rs)
 				}
@@ -80,14 +80,8 @@ func Init() {
 func ListServers() {
 	Init()
 	fmt.Println("Servers(Name:Host):")
-	var maxLen = 0
 	for _, s := range ServersCache {
-		if len(s.Name) > maxLen {
-			maxLen = len(s.Name)
-		}
-	}
-	for _, s := range ServersCache {
-		fmt.Println("  " + s.Name + strings.Repeat(" ", maxLen-len(s.Name)) + " : " + s.Host)
+		fmt.Println(s.info())
 	}
 }
 
@@ -101,32 +95,23 @@ func AddServer(name string, host string, port int, auth string) {
 		name = host
 	}
 	Init()
-	var exists = false
 	for i := range ServersCache {
 		if (ServersCache[i].Host == host && ServersCache[i].Port == port) || ServersCache[i].Name == name {
-			ServersCache[i].Name = name
-			ServersCache[i].Auth = auth
-			ServersCache[i].Host = host
-			ServersCache[i].Port = port
-			exists = true
+			fmt.Printf("Name:%s or Server:%s has exists\n", name, host)
+			return
 		}
 	}
 
-	if !exists {
-		server := RedisServer{
-			Name: name,
-			Host: host,
-			Port: port,
-			Auth: auth}
-		ServersCache = append(ServersCache, server)
-	}
-
+	server := RedisServer{
+		Name: name,
+		Host: host,
+		Port: port,
+		Auth: Encrypt(auth)}
+	ServersCache = append(ServersCache, server)
 	persistent2Local()
 }
 
 func persistent2Local() {
-	// fmt.Printf("persistenting...\n")
-	// ensureSavePathExist(localStoragePath)
 	file, _ := os.Create(getStoragePath() + localStorageFile)
 	writer := bufio.NewWriter(file)
 	defer func() {
@@ -150,7 +135,26 @@ func persistent2Local() {
 }
 
 func UpdateServer(name string, host string, port int, auth string) {
-	AddServer(name, host, port, auth)
+	Init()
+	for i := range ServersCache {
+		if (ServersCache[i].Host == host && ServersCache[i].Port == port) || ServersCache[i].Name == name {
+			if name != "" {
+				ServersCache[i].Name = name
+			}
+			if host != "" {
+				ServersCache[i].Host = host
+			}
+			if port != ServersCache[i].Port {
+				ServersCache[i].Port = port
+			}
+			if auth != "" {
+				ServersCache[i].Auth = Encrypt(auth)
+			}
+			persistent2Local()
+			return
+		}
+	}
+	fmt.Printf("Name:%s or Host:%s not found\n", name, host)
 }
 
 func RemoveServer(name string, host string) {
@@ -188,36 +192,6 @@ func ConnectServer(name string) {
 			cmdParser(&s)
 			break
 		}
-	}
-}
-
-func InfoServer(name string, host string) {
-	Init()
-	var tempServers = make([]RedisServer, 0)
-	if name != "" && host != "" {
-		for _, s := range ServersCache {
-			if name == s.Name && host == s.Host {
-				tempServers = append(tempServers, s)
-			}
-		}
-	} else {
-		if name != "" {
-			for _, s := range ServersCache {
-				if name == s.Name {
-					tempServers = append(tempServers, s)
-				}
-			}
-		}
-		if host != "" {
-			for _, s := range ServersCache {
-				if host == s.Host {
-					tempServers = append(tempServers, s)
-				}
-			}
-		}
-	}
-	for _, s := range tempServers {
-		fmt.Println(s.info())
 	}
 }
 
