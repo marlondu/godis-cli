@@ -64,7 +64,7 @@ func Init() {
 						Name: name,
 						Host: host,
 						Port: port,
-						Auth: Encrypt(auth),
+						Auth: auth,
 					}
 					ServersCache = append(ServersCache, rs)
 				}
