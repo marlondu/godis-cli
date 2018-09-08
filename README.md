@@ -9,10 +9,16 @@ Is dependent on redigo module, you can install it with:
 go get github.com/gomodule/redigo/redis
 ```
 
-## Download
+## Download & Install
+- You can download binary file from [here](https://github.com/marlondu/godis-cli/releases)
+- Or if you have installed golang environment, you can install it with source code:
 
 ```sh
-go get github.com/marlondu/godis-cli
+$ go get github.com/marlondu/godis-cli
+$ cd ${GOPATH}/github.com/marlondu/godis-cli
+$ go build .
+# for macOS
+$ sudo sh install.sh
 ```
 
 ## Help

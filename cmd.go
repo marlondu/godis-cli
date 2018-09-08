@@ -93,11 +93,11 @@ Usage:
 	godis-cli [arguments] <command> 
 
 The commands are:
-	add	add a new redis server
-	list	list all servers
-	update	update a server
-	remove 	remove a server
-	conn	connect to server
+	add(a)	add a new redis server
+	list(l)	list all servers
+	update(u)	update a server
+	remove(r) 	remove a server
+	conn(c)	connect to server
 
 Use "godis-cli help <command>" for more information about a command`
 
@@ -105,7 +105,7 @@ Use "godis-cli help <command>" for more information about a command`
 }
 
 func printCmdHelpTips() {
-	var tips = `the supported commands are list, add, update, remove, info
+	var tips = `the supported commands are list(l), add(a), update(u), remove(r)
 Usage:
 	godis-cli [parameters] <commands>
 

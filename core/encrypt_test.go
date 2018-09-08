@@ -17,5 +17,9 @@ func TestEncrypt(t *testing.T) {
 func TestDecrypt(t *testing.T) {
 	src := "dn59CF4QjkBhwuTYuPnnt2o/o14Vz3vR3pl2/waF6mY+BEQTUgDM3tV/jQiu0Bf+"
 	dec := Decrypt(src)
-	t.Logf("Decrypt:%s\n", dec)
+	if dec != "" {
+		t.Logf("decrypted to:%s", dec)
+	} else {
+		t.Errorf("decrypted error")
+	}
 }
