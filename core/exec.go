@@ -17,16 +17,7 @@ import (
 
 func cmdParser(server *RedisServer) {
 	reader := bufio.NewReader(os.Stdin)
-	var conn redis.Conn
-	var err error
-	// create connection with redis
-	address := server.Host + ":" + strconv.Itoa(server.Port)
-	if server.Auth != "" {
-		option := redis.DialPassword(Decrypt(server.Auth))
-		conn, err = redis.Dial("tcp", address, option, redis.DialConnectTimeout(3*time.Second))
-	} else {
-		conn, err = redis.Dial("tcp", address, redis.DialConnectTimeout(3*time.Second))
-	}
+	conn, err := obtainConnection(server)
 	// release connection when function exit
 	defer func() {
 		conn.Flush()
@@ -51,6 +42,11 @@ func cmdParser(server *RedisServer) {
 			for i, c := range commands[1:] {
 				params[i] = c
 			}
+			err = ensureConnected(&conn, server)
+			if err != nil {
+				fmt.Printf("obtain a new connection error:%v\n", err)
+				continue
+			}
 			reply, err := conn.Do(cmd, params...)
 			if err != nil {
 				fmt.Printf("execute command:%s error:%v\n", cmd, err)
@@ -67,6 +63,35 @@ func cmdParser(server *RedisServer) {
 		}
 	}
 
+}
+
+func obtainConnection(server *RedisServer) (conn redis.Conn, err error) {
+	// create connection with redis
+	address := server.Host + ":" + strconv.Itoa(server.Port)
+	options := []redis.DialOption{
+		redis.DialKeepAlive(15 * time.Minute),
+		redis.DialConnectTimeout(3 * time.Second),
+	}
+	if server.Auth != "" {
+		options = append(options, redis.DialPassword(Decrypt(server.Auth)))
+	}
+	conn, err = redis.Dial("tcp", address, options...)
+	return
+}
+
+func ensureConnected(conn *redis.Conn, server *RedisServer) error {
+	err := (*conn).Err()
+	if err != nil {
+		// connection is not usable
+		// reload connection
+		connection, err := obtainConnection(server)
+		if err != nil {
+			return err
+		} else {
+			*conn = connection
+		}
+	}
+	return nil
 }
 
 func printReply(reply interface{}) {
